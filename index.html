@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Met Ultah tahun oyy</title>
+  
+  <!-- Library Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Georgia', serif, sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden; /* Mencegah geser/scroll ke kanan */
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      padding: 20px;
+      background-color: #e7f0f8;
+      isolation: isolate;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: -20px;
+      background-image: url('./background/53869943bead0bf981d0266c0607f232.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(8px);
+      transform: scale(1.05);
+      z-index: -1;
+    }
+
+    /* Keyframes Animasi Transisi */
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes popOut {
+      0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.85) translateY(-20px);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .animate-pop-in {
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .animate-pop-out {
+      animation: popOut 0.3s ease-in forwards;
+    }
+
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px;
+      padding: 35px 25px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      transition: max-width 0.4s ease;
+    }
+
+    .card.wide-card {
+      max-width: 900px;
+    }
+
+    .sticker {
+      position: absolute;
+      font-size: 1.8rem;
+      user-select: none;
+    }
+    .sticker.top-left { top: -12px; left: -12px; transform: rotate(-15deg); }
+    .sticker.top-right { top: -12px; right: -12px; transform: rotate(15deg); }
+    .sticker.bottom-left { bottom: -12px; left: -12px; transform: rotate(10deg); }
+    .sticker.bottom-right { bottom: -12px; right: -12px; transform: rotate(-10deg); }
+
+    .profile-img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      color: #55606e;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .message p {
+      margin-bottom: 8px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      position: relative;
+    }
+
+    .btn {
+      width: 80%;
+      max-width: 260px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: #4b92be;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #3b7da3;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background-color: #dbeaf4;
+      color: #5b7185;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: #c9e0f0;
+    }
+
+    .content-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      text-align: left;
+    }
+
+    .photo-portrait {
+      width: 120px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Styling Video Player Halaman 3 */
+    .video-container {
+      width: 100%;
+      margin-bottom: 25px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      background: #000;
+    }
+
+    .video-player {
+      width: 100%;
+      max-height: 350px;
+      display: block;
+      outline: none;
+    }
+
+    .note-box {
+      background: #f2f7fc;
+      border: 1px solid #e1ebf5;
+      border-radius: 12px;
+      padding: 15px;
+      position: relative;
+      flex-grow: 1;
+      font-size: 0.9rem;
+      color: #4a5568;
+      line-height: 1.6;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.02);
+    }
+
+    .note-box::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      border-width: 0 14px 14px 0;
+      border-style: solid;
+      border-color: #d2e3f3 #ffffff;
+      display: block;
+      width: 0;
+      box-shadow: -1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* Galeri Foto */
+    .gallery-title {
+      font-size: 1.15rem;
+      color: #3f5160;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .gallery-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .gallery-row {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row-top {
+      grid-template-columns: repeat(6, 1fr);
+    }
+
+    .row-bottom {
+      grid-template-columns: repeat(5, 1fr);
+      padding: 0 20px;
+    }
+
+    .gallery-item {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .gallery-item:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Pin / Lock Screen Styles */
+    .pin-title {
+      font-size: 1.25rem;
+      color: #3f5160;
+      margin-bottom: 15px;
+    }
+
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .pin-dot {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #4b92be;
+      border-radius: 50%;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .pin-dot.filled {
+      background-color: #4b92be;
+      transform: scale(1.1);
+    }
+
+    .pin-clue {
+      font-size: 0.85rem;
+      color: #718096;
+      margin-bottom: 25px;
+    }
+
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .num-btn {
+      background: #edf4fa;
+      border: 1px solid #d0e2f0;
+      border-radius: 12px;
+      padding: 14px 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #3f5160;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .num-btn:active {
+      transform: scale(0.95);
+      background: #dbeaf4;
+    }
+
+    .num-btn.btn-backspace {
+      background: #4b92be;
+      color: #ffffff;
+      border-color: #3b7da3;
+    }
+
+    /* Modal Image Preview (Polaroid Style) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      max-width: 100%;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: fadeIn 0.3s ease forwards;
+      overflow: hidden; /* Fix meluap di HP */
+    }
+
+    .polaroid-card {
+      background: #ffffff;
+      padding: 16px 16px 24px 16px;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      position: relative;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      transform: rotate(-2.5deg);
+      transition: transform 0.3s ease;
+    }
+
+    .polaroid-card:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .close-modal-btn {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      background: #ffffff;
+      color: #3f5160;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      border: none;
+      z-index: 10;
+      transition: background 0.2s;
+    }
+
+    .close-modal-btn:hover {
+      background: #f0f4f8;
+    }
+
+    .polaroid-img-frame {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 6px;
+      background: #f7fafc;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .polaroid-caption {
+      font-family: 'Caveat', 'Georgia', cursive, serif;
+      margin: 18px 0 12px 0;
+      color: #4a5568;
+      font-size: 1.1rem;
+    }
+
+    .btn-download {
+      background: #4b92be;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-download:hover {
+      background: #3b7da3;
+    }
+
+    /* Modal Countdown Redirect */
+    .redirect-modal-card {
+      background: #ffffff;
+      padding: 30px 25px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .countdown-number {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #4b92be;
+      margin: 15px 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsif Layar HP */
+    @media (max-width: 600px) {
+      .row-top {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .row-bottom {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 0;
+      }
+      .content-wrapper {
+        flex-direction: column;
+        text-align: center;
+      }
+      .photo-portrait {
+        width: 110px;
+        height: 165px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card animate-pop-in" id="mainCard">
+    <div class="sticker top-left">⭐</div>
+    <div class="sticker top-right">✨</div>
+    <div class="sticker bottom-left">✉️</div>
+    <div class="sticker bottom-right">🎁</div>
+
+    <!-- HALAMAN 1 -->
+    <div id="page1">
+      <img src="./foto/peepo.gif" alt="Pepe Birthday" class="profile-img" />
+      <div class="message">
+        <p>Weittss, ada yg ultah tahun nihh wkwk</p>
+        <p><strong>kalo bisa sih buka ini di laptop yaaa</strong></p>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="goToPage(2)">lah iya tuh gua ultahh</button>
+        <button class="btn btn-secondary" id="btnMalas" onclick="moveButton()">malass</button>
+      </div>
+    </div>
+
+    <!-- HALAMAN 2 -->
+    <div id="page2" class="hidden">
+      <div class="content-wrapper">
+        <img src="./foto/ini.jpeg" class="photo-portrait" alt="Foto 1" />
+        <div class="note-box">
+          <p><strong>HBD yaaa..</strong></p>
+          <p style="margin-top: 6px;">
+            Semoga di usia yang semakin dewasa ini, lu diberikan kesehatan, kebahagiaan, dan kesuksesan dalam segala hal yang lu lakukan.
+          </p>
+        </div>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="goToPage(3)">Lanjut</button>
+      </div>
+    </div>
+
+    <!-- HALAMAN 3  -->
+     <div id="page3" class="hidden">
+      <div class="content-wrapper">
+        <img src="./foto/page3.jpeg" class="photo-portrait" alt="Foto 4" />
+        <div class="note-box">
+          <p>
+            Dan semoga tahun ini menjadi tahun terbaik dalam hidup lu sejauh ini, dan tahun-tahun mendatang akan membawa lebih banyak kebahagiaan dan pencapaian. Aamiinn..
+          </p>
+        </div>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="goToPage(4)">Lanjut</button>
+      </div>
+    </div>
+    
+
+    <!-- HALAMAN 4 (video) -->
+    <div id="page4" class="hidden">
+        <p style="margin-bottom: 10px;"><strong>ada ucapan dari mas wowok</strong></p>
+      <div class="video-container">
+        <video class="video-player" controls preload="metadata">
+          <source src="./video/dari-mas-wowok.mp4" type="video/mp4" />
+          error...
+        </video>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="goToPage(5)">Lanjut</button>
+      </div>
+    </div>
+
+    <!-- HALAMAN 5 (KONTEN LAMA HALAMAN 4) -->
+    <div id="page5" class="hidden">
+      <div class="content-wrapper">
+        <div class="note-box">
+          <p>
+            <strong>Mari kita sedikit nostalgia dikit yakk...</strong>
+          </p>
+        </div>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="goToPage(6)">Nostalgia?</button>
+      </div>
+    </div>
+
+    <!-- HALAMAN 6: GALERI FOTO NOSTALGIA -->
+    <div id="page6" class="hidden">
+      <h3 class="gallery-title">Ini beberapa foto yang pernah lu lewati masanya..</h3>
+      
+      <div class="gallery-grid">
+        <!-- Baris Atas (6 Foto) -->
+        <div class="gallery-row row-top">
+          <img src="./foto/kenangan/1.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/2.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/3.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/4.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/5.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/6.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+        </div>
+        <!-- Baris Bawah (5 Foto) -->
+        <div class="gallery-row row-bottom">
+          <img src="./foto/kenangan/7.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/8.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/9.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/10.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+          <img src="./foto/kenangan/11.jpeg" class="gallery-item" onclick="openPreview(this.src)"/>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="goToPage(7)">Lanjut</button>
+      </div>
+    </div>
+
+
+        <div id="page7" class="hidden">
+      <div class="content-wrapper">
+        <img src="./foto/roblox.PNG"/>
+        <div class="note-box">
+          <p>
+            Hehe, itu salah satu bagian dari hadiah gua sih.. karna, menurut gua ga adil kalo foto foto ini cuma gua sendirian yang nyimpen.. dann,  sengaja aja.. biar lu bisa tau kalo lu udah berkembang banget dari diri lu yang dulu itu..
+          </p>
+        </div>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="goToPage(8)">Lanjut</button>
+      </div>
+    </div>
+
+    <!-- HALAMAN 8  -->
+        <div id="page8" class="hidden">
+      <div class="content-wrapper">
+        <img src="./foto/wowok.PNG"/>
+        <div class="note-box">
+          <p>Ohh yaa, next lu harus berpikir sedikit keras nih.. lu harus inget sesuatu hal tentang lu..
+          </p>
+          <p><strong>siapin google translate juga boleh awkaokwaokw</strong></p>
+        </div>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="goToPage(9)">Emang apaan dah?</button>
+      </div>
+    </div>
+
+    <!-- HALAMAN 9: TEBAK PASSWORD / PIN -->
+    <div id="page9" class="hidden">
+      <h3 class="pin-title">Cobaa tebak password nya</h3>
+      
+      <div class="pin-dots">
+        <div class="pin-dot" id="dot0"></div>
+        <div class="pin-dot" id="dot1"></div>
+        <div class="pin-dot" id="dot2"></div>
+        <div class="pin-dot" id="dot3"></div>
+        <div class="pin-dot" id="dot4"></div>
+        <div class="pin-dot" id="dot5"></div>
+      </div>
+
+      <p class="pin-clue">clue: tanggal born, ambil 2 angka belakangnya aja kalo angkanya ribuan</p>
+
+      <div class="numpad">
+        <button class="num-btn" onclick="pressNum('1')">1</button>
+        <button class="num-btn" onclick="pressNum('2')">2</button>
+        <button class="num-btn" onclick="pressNum('3')">3</button>
+        <button class="num-btn" onclick="pressNum('4')">4</button>
+        <button class="num-btn" onclick="pressNum('5')">5</button>
+        <button class="num-btn" onclick="pressNum('6')">6</button>
+        <button class="num-btn" onclick="pressNum('7')">7</button>
+        <button class="num-btn" onclick="pressNum('8')">8</button>
+        <button class="num-btn" onclick="pressNum('9')">9</button>
+        <div></div>
+        <button class="num-btn" onclick="pressNum('0')">0</button>
+        <button class="num-btn btn-backspace" onclick="pressBackspace()">
+          <i class="fa-solid fa-square-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- HALAMAN 10: TERBUKA / KLAIM HADIAH -->
+    <div id="page10" class="hidden">
+      <img src="./foto/peepo.gif" alt="Success" class="profile-img" />
+      <div class="message">
+        <p><strong>Yeayyy Benerr!! 🎉</strong></p>
+        <p style="margin-top: 8px;">Oke, yang di tunggu-tunggu nih.. Hadiahnya emang kecil, tapi gua harap ini bermanfaat ^^</p>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="startGiftRedirect('https://shorturl.at/oR5QH')">
+          <i class="fa-solid fa-gift"></i> Ambil Hadiah
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL PREVIEW POLAROID -->
+  <div id="previewModal" class="modal-overlay hidden">
+    <div class="polaroid-card animate-pop-in">
+      <button class="close-modal-btn" onclick="closePreview()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="modalImg" src="" class="polaroid-img-frame" alt="Memory Preview" />
+      <a id="downloadBtn" href="" download="kenangan.jpeg" class="btn-download">
+        <i class="fa-solid fa-download"></i> Simpan foto
+      </a>
+    </div>
+  </div>
+
+  <!-- MODAL COUNTDOWN REDIRECT -->
+  <div id="redirectModal" class="modal-overlay hidden">
+    <div class="redirect-modal-card animate-pop-in">
+      <p style="color: #4a5568; font-size: 0.95rem;">Kamu akan meninggalkan web ini, dan akan diarahkan ke link dalam</p>
+      <div class="countdown-number" id="countdownTimer">3</div>
+      <p style="color: #718096; font-size: 0.85rem;">Siap-siap ya! 🎁</p>
+    </div>
+  </div>
+
+  <script>
+    // Confetti saat pertama kali buka
+    window.addEventListener('DOMContentLoaded', () => {
+      confetti({
+        particleCount: 70,
+        spread: 60,
+        origin: { y: 0.6 }
+      });
+    });
+
+    let currentPage = 1;
+
+    // Fungsi Utama Transisi Animasi Pop-Out & Pop-In antar Halaman
+    function goToPage(targetPage) {
+      const card = document.getElementById('mainCard');
+      const fromPage = document.getElementById(`page${currentPage}`);
+      const toPage = document.getElementById(`page${targetPage}`);
+
+      // Efek confetti saat pindah halaman awal & galeri
+      if (currentPage === 1) {
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+      }
+
+      if (targetPage === 6) {
+        confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+      }
+
+      // Hentikan pemutaran video jika berpindah dari Halaman 3
+      if (currentPage === 3) {
+        const video = document.querySelector('#page3 video');
+        if (video) {
+          video.pause();
+        }
+      }
+
+      // Mulai animasi Pop Out
+      card.classList.remove('animate-pop-in');
+      card.classList.add('animate-pop-out');
+
+      setTimeout(() => {
+        fromPage.classList.add('hidden');
+        toPage.classList.remove('hidden');
+
+        // Khusus Halaman 6 (Galeri) kartu dibuat lebih lebar
+        if (targetPage === 6) {
+          card.classList.add('wide-card');
+        } else {
+          card.classList.remove('wide-card');
+        }
+
+        currentPage = targetPage;
+
+        // Jalankan kembali animasi Pop In
+        card.classList.remove('animate-pop-out');
+        card.classList.add('animate-pop-in');
+      }, 300);
+    }
+
+    // Tombol "Malass"
+    let clickCount = 0;
+    function moveButton() {
+      const btn = document.getElementById('btnMalas');
+      clickCount++;
+
+      if (clickCount >= 4) {
+        btn.style.position = 'fixed';
+        btn.style.left = '-9999px';
+        btn.style.top = '-9999px';
+        btn.style.opacity = '0';
+        alert("di buka hadiah gua cak kocak.. malah klik yang males njir...");
+        return;
+      }
+
+      const x = (Math.random() - 0.5) * 200;
+      const y = (Math.random() - 0.5) * 200;
+      btn.style.position = 'relative';
+      btn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    /* --- LOGIKA PREVIEW FOTO POLAROID --- */
+    function openPreview(src) {
+      const modal = document.getElementById('previewModal');
+      const modalImg = document.getElementById('modalImg');
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      modalImg.src = src;
+      downloadBtn.href = src;
+      modal.classList.remove('hidden');
+    }
+
+    function closePreview() {
+      const modal = document.getElementById('previewModal');
+      modal.classList.add('hidden');
+    }
+
+    /* --- LOGIKA PIN SYSTEM --- */
+    const CORRECT_PIN = "210708";
+    let inputPin = "";
+
+    function updatePinDots() {
+      for (let i = 0; i < 6; i++) {
+        const dot = document.getElementById(`dot${i}`);
+        if (i < inputPin.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      }
+    }
+
+    function pressNum(num) {
+      if (inputPin.length < 6) {
+        inputPin += num;
+        updatePinDots();
+
+        if (inputPin.length === 6) {
+          setTimeout(() => {
+            if (inputPin === CORRECT_PIN) {
+              confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+              goToPage(10);
+            } else {
+              alert("Password salah! Coba tebak lagi...");
+              inputPin = "";
+              updatePinDots();
+            }
+          }, 200);
+        }
+      }
+    }
+
+    function pressBackspace() {
+      if (inputPin.length > 0) {
+        inputPin = inputPin.slice(0, -1);
+        updatePinDots();
+      }
+    }
+
+    /* --- LOGIKA COUNTDOWN REDIRECT HADIAH --- */
+    function startGiftRedirect(targetUrl) {
+      const redirectModal = document.getElementById('redirectModal');
+      const timerDisplay = document.getElementById('countdownTimer');
+      let timeLeft = 3;
+
+      timerDisplay.textContent = timeLeft;
+      redirectModal.classList.remove('hidden');
+
+      const countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          timerDisplay.textContent = timeLeft;
+        } else {
+          clearInterval(countdownInterval);
+          window.location.href = targetUrl;
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
